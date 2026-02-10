@@ -2,7 +2,10 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #000000;
+  --adidas-black: #000000;
+  --adidas-white: #ffffff;
+  --adidas-accent: #000000;
 }
 
 @theme inline {
@@ -10,17 +13,65 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-adi: var(--font-adi);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #000000;
+    --foreground: #ffffff;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-adi), var(--font-geist-sans), system-ui, sans-serif;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+/* Apply adi font to all text elements */
+h1, h2, h3, h4, h5, h6,
+p, span, div, button, input, textarea,
+label, a {
+  font-family: var(--font-adi), var(--font-geist-sans), system-ui, sans-serif;
+}
+
+/* Vertical three stripes pattern */
+.adi-stripes-vertical {
+  position: relative;
+  display: inline-flex;
+  gap: 2px;
+}
+
+.adi-stripes-vertical::before,
+.adi-stripes-vertical::after {
+  content: '';
+  width: 3px;
+  height: 100%;
+  background: currentColor;
+}
+
+.adi-stripes-vertical::before {
+  position: absolute;
+  left: 0;
+}
+
+.adi-stripes-vertical::after {
+  position: absolute;
+  right: 0;
+}
+
+.adi-stripes-vertical {
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+.adi-stripes-vertical::before {
+  left: 0;
+}
+
+.adi-stripes-vertical::after {
+  right: 0;
 }

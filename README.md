@@ -1,36 +1,70 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## adi running assistant
 
-## Getting Started
+adi running assistant is an adidas‑inspired running coach ui built with **next.js (app router)** and the **vercel ai sdk**.  
+it helps runners with pace calculations, training zones, and race‑time predictions, with tool‑calling powered by anthropic.
 
-First, run the development server:
+### features
+
+- **chat interface** with `useChat` from `@ai-sdk/react`
+- **ai tools** defined in `app/actions.ts`:
+  - `calculatePace` – calculates pace per km from distance and time
+  - `suggestTrainingZones` – builds pace training zones from threshold pace
+- **streaming responses** via `app/api/chat/route.ts` and `streamText`
+- **custom adidas‑style ui**:
+  - adi font using `localFont` in `app/layout.tsx`
+  - horizontal three‑stripe accents
+  - centered input bar and tool result cards (`app/page.tsx`)
+- **light/dark mode friendly** using tailwind (v4) utilities
+
+### getting started (local)
+
+1. **install dependencies**
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. **set environment variables**
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+create a `.env.local` file in the project root:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+ANTHROPIC_API_KEY=your_anthropic_key_here
+```
 
-## Learn More
+3. **run the dev server**
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+pnpm dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+open `http://localhost:3000` in your browser.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### project structure
 
-## Deploy on Vercel
+- `app/layout.tsx` – root layout, global fonts, and metadata
+- `app/page.tsx` – main chat ui and adidas‑inspired layout
+- `app/actions.ts` – ai tools (`calculatePace`, `suggestTrainingZones`)
+- `app/api/chat/route.ts` – chat api using `streamText` + anthropic
+- `app/components/MarkdownText.tsx` – lightweight markdown renderer for ai responses
+- `app/fonts/` – adi font files (`adineuePRO-Regular.otf`, etc.)
+- `app/globals.css` – tailwind + css variables, global typography
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### deployment
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+the app is a standard next.js project and is easiest to deploy on **vercel**:
+
+1. push this repo to github/gitlab/bitbucket.
+2. in vercel, create a new project and import the repo.
+3. set the environment variable `ANTHROPIC_API_KEY` in the vercel dashboard.
+4. deploy – vercel will run `next build` and host the app.
+
+for self‑hosting:
+
+```bash
+pnpm install
+pnpm build
+pnpm start
+```
+
+make sure `ANTHROPIC_API_KEY` is set in the environment on your server.

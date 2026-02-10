@@ -2,172 +2,274 @@
 
 import { useChat } from '@ai-sdk/react';
 import { useState } from 'react';
+import { MarkdownText } from './components/MarkdownText';
 
 export default function Chat() {
   const [input, setInput] = useState('');
   const { messages, sendMessage } = useChat();
   
   return (
-    <div className="flex flex-col w-full max-w-md py-24 mx-auto stretch">
+    <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white">
+      {/* Header */}
+      <header className="sticky top-0 z-10 bg-white/95 dark:bg-black/95 backdrop-blur-sm border-b border-black/10 dark:border-white/10">
+        <div className="max-w-4xl mx-auto px-6 py-4">
+          <div className="flex items-center gap-3">
+            <div className="flex flex-col gap-0.5">
+              <div className="h-0.5 w-8 bg-black dark:bg-white"></div>
+              <div className="h-0.5 w-8 bg-black dark:bg-white"></div>
+              <div className="h-0.5 w-8 bg-black dark:bg-white"></div>
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold tracking-tight" style={{ fontFamily: 'var(--font-adi)' }}>adi</h1>
+              <p className="text-xs text-black/60 dark:text-white/60 uppercase tracking-wider" style={{ fontFamily: 'var(--font-adi)' }}>Running Assistant</p>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Chat Area */}
+      <main className="max-w-4xl mx-auto px-6 py-12">
+        {messages.length === 0 && (
+          <div className="text-center py-20">
+            <div className="mb-8">
+              <div className="inline-flex flex-col gap-0.5 mb-6">
+                <div className="h-1 w-16 bg-black dark:bg-white"></div>
+                <div className="h-1 w-16 bg-black dark:bg-white"></div>
+                <div className="h-1 w-16 bg-black dark:bg-white"></div>
+              </div>
+            </div>
+            <h2 className="text-4xl font-bold mb-4 tracking-tight" style={{ fontFamily: 'var(--font-adi)' }}>ready to have the best <span className="line-through">fun</span> run of your life?</h2>
+            <p className="text-black/60 dark:text-white/60 text-lg mb-8 max-w-md mx-auto">
+              ask me about pace calculations, training zones, or race predictions.
+            </p>
+          </div>
+        )}
+
+        <div className="space-y-6 mb-32">
       {messages.map(message => (
-        <div key={message.id} className="whitespace-pre-wrap mb-4">
-          <strong>{message.role === 'user' ? 'User: ' : 'AI: '}</strong>
+            <div 
+              key={message.id} 
+              className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+            >
+              <div className={`max-w-[85%] ${message.role === 'user' ? 'text-right' : 'text-left'}`}>
           {message.parts.map((part, i) => {
             switch (part.type) {
               case 'text':
-                return <div key={`${message.id}-${i}`}>{part.text}</div>;
-              
-              case 'tool-result': {
-                const toolPart = part as any;
+                      if (message.role === 'user') {
+                        return (
+                          <div 
+                            key={`${message.id}-${i}`} 
+                            className="inline-block px-4 py-3 rounded-lg bg-black text-white dark:bg-white dark:text-black"
+                          >
+                            {part.text}
+                          </div>
+                        );
+                      } else {
+                        return (
+                          <div 
+                            key={`${message.id}-${i}`} 
+                            className="bg-black/5 dark:bg-white/5 text-black dark:text-white px-6 py-4 rounded-lg my-2 max-w-full"
+                          >
+                            <MarkdownText text={part.text} />
+                          </div>
+                        );
+                      }
+                    
+                    case 'tool-result': {
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      const toolPart = part as any;
 
-                // Check if we have a completed tool call with output
-                if (toolPart.state === 'result' && toolPart.output) {
-                  // Pace Calculator
-                  if (toolPart.toolName === 'calculatePace') {
-                    const result = toolPart.output as {
-                      pacePerKm: string;
-                      totalTime: string;
-                      distance: number;
-                    };
-                    return (
-                      <div key={`${message.id}-${i}`} className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg my-2 border border-blue-200 dark:border-blue-800">
-                        <h3 className="font-bold mb-2 text-blue-900 dark:text-blue-100">📊 Pace Calculator</h3>
-                        <div className="space-y-1">
-                          <p><strong>Pace:</strong> {result.pacePerKm} /km</p>
-                          <p><strong>Total Time:</strong> {result.totalTime}</p>
-                          <p><strong>Distance:</strong> {result.distance} km</p>
-                        </div>
-                      </div>
-                    );
-                  }
-                  
-                  // Training Zones
-                  if (toolPart.toolName === 'suggestTrainingZones') {
-                    const result = toolPart.output as {
-                      zone1: string;
-                      zone2: string;
-                      zone3: string;
-                      zone4: string;
-                      zone5: string;
-                      thresholdPace: string;
-                    };
-                    return (
-                      <div key={`${message.id}-${i}`} className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg my-2 border border-green-200 dark:border-green-800">
-                        <h3 className="font-bold mb-2 text-green-900 dark:text-green-100">🎯 Training Zones</h3>
-                        <p className="text-sm mb-3 text-green-700 dark:text-green-300">Based on threshold: {result.thresholdPace}</p>
-                        <div className="space-y-2">
-                          <div className="bg-white dark:bg-gray-800 p-2 rounded">
-                            <p className="text-xs text-gray-600 dark:text-gray-400">Zone 1 - Easy/Recovery</p>
-                            <p className="font-mono text-sm">{result.zone1}</p>
-                          </div>
-                          <div className="bg-white dark:bg-gray-800 p-2 rounded">
-                            <p className="text-xs text-gray-600 dark:text-gray-400">Zone 2 - Aerobic Endurance</p>
-                            <p className="font-mono text-sm">{result.zone2}</p>
-                          </div>
-                          <div className="bg-white dark:bg-gray-800 p-2 rounded">
-                            <p className="text-xs text-gray-600 dark:text-gray-400">Zone 3 - Tempo</p>
-                            <p className="font-mono text-sm">{result.zone3}</p>
-                          </div>
-                          <div className="bg-white dark:bg-gray-800 p-2 rounded">
-                            <p className="text-xs text-gray-600 dark:text-gray-400">Zone 4 - Threshold</p>
-                            <p className="font-mono text-sm">{result.zone4}</p>
-                          </div>
-                          <div className="bg-white dark:bg-gray-800 p-2 rounded">
-                            <p className="text-xs text-gray-600 dark:text-gray-400">Zone 5 - VO2 Max</p>
-                            <p className="font-mono text-sm">{result.zone5}</p>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  }
-                  
-                  // Race Time Predictions
-                  if (toolPart.toolName === 'predictRaceTime') {
-                    const result = toolPart.output as {
-                      baseRace: string;
-                      predictions: {
-                        '5K': string;
-                        '10K': string;
-                        'Half Marathon': string;
-                        'Marathon': string;
-                      };
-                    };
-                    return (
-                      <div key={`${message.id}-${i}`} className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg my-2 border border-purple-200 dark:border-purple-800">
-                        <h3 className="font-bold mb-2 text-purple-900 dark:text-purple-100">🏃 Race Time Predictions</h3>
-                        <p className="text-sm mb-3 text-purple-700 dark:text-purple-300">Based on: {result.baseRace}</p>
-                        <div className="grid grid-cols-2 gap-2">
-                          <div className="bg-white dark:bg-gray-800 p-2 rounded">
-                            <p className="text-xs text-gray-600 dark:text-gray-400">5K</p>
-                            <p className="font-mono text-lg font-bold">{result.predictions['5K']}</p>
-                          </div>
-                          <div className="bg-white dark:bg-gray-800 p-2 rounded">
-                            <p className="text-xs text-gray-600 dark:text-gray-400">10K</p>
-                            <p className="font-mono text-lg font-bold">{result.predictions['10K']}</p>
-                          </div>
-                          <div className="bg-white dark:bg-gray-800 p-2 rounded">
-                            <p className="text-xs text-gray-600 dark:text-gray-400">Half Marathon</p>
-                            <p className="font-mono text-lg font-bold">{result.predictions['Half Marathon']}</p>
-                          </div>
-                          <div className="bg-white dark:bg-gray-800 p-2 rounded">
-                            <p className="text-xs text-gray-600 dark:text-gray-400">Marathon</p>
-                            <p className="font-mono text-lg font-bold">{result.predictions['Marathon']}</p>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  }
-                  
-                  // Fallback for any other tools
+                      if (toolPart.state === 'result' && toolPart.output) {
+                        // Pace Calculator
+                        if (toolPart.toolName === 'calculatePace') {
+                          const result = toolPart.output as {
+                            pacePerKm: string;
+                            totalTime: string;
+                            distance: number;
+                          };
+                          return (
+                            <div key={`${message.id}-${i}`} className="bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 p-6 rounded-lg my-2">
+                              <div className="flex items-center gap-2 mb-4">
+                                <div className="flex flex-col gap-0.5">
+                                  <div className="h-0.5 w-4 bg-black dark:bg-white"></div>
+                                  <div className="h-0.5 w-4 bg-black dark:bg-white"></div>
+                                  <div className="h-0.5 w-4 bg-black dark:bg-white"></div>
+                                </div>
+                                <h3 className="font-bold text-sm uppercase tracking-wider" style={{ fontFamily: 'var(--font-adi)' }}>Pace Calculator</h3>
+                              </div>
+                              <div className="space-y-3">
+                                <div className="border-t border-black/10 dark:border-white/10 pt-3">
+                                  <p className="text-xs uppercase tracking-wider text-black/60 dark:text-white/60 mb-1" style={{ fontFamily: 'var(--font-adi)' }}>Pace</p>
+                                  <p className="text-2xl font-bold" style={{ fontFamily: 'var(--font-adi)' }}>{result.pacePerKm} /km</p>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4 border-t border-black/10 dark:border-white/10 pt-3">
+                                  <div>
+                                    <p className="text-xs uppercase tracking-wider text-black/60 dark:text-white/60 mb-1" style={{ fontFamily: 'var(--font-adi)' }}>Time</p>
+                                    <p className="text-lg font-semibold" style={{ fontFamily: 'var(--font-adi)' }}>{result.totalTime}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-xs uppercase tracking-wider text-black/60 dark:text-white/60 mb-1" style={{ fontFamily: 'var(--font-adi)' }}>Distance</p>
+                                    <p className="text-lg font-semibold" style={{ fontFamily: 'var(--font-adi)' }}>{result.distance} km</p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        }
+                        
+                        // Training Zones
+                        if (toolPart.toolName === 'suggestTrainingZones') {
+                          const result = toolPart.output as {
+                            zone1: string;
+                            zone2: string;
+                            zone3: string;
+                            zone4: string;
+                            zone5: string;
+                            thresholdPace: string;
+                          };
                   return (
-                    <pre key={`${message.id}-${i}`} className="bg-gray-100 dark:bg-gray-800 p-2 rounded text-xs overflow-x-auto">
-                      {JSON.stringify(toolPart.output, null, 2)}
-                    </pre>
-                  );
-                }
-                
-                // Handle loading state
-                if (toolPart.state === 'call') {
-                  return (
-                    <div key={`${message.id}-${i}`} className="text-gray-500 italic">
-                      Calculating...
+                            <div key={`${message.id}-${i}`} className="bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 p-6 rounded-lg my-2">
+                              <div className="flex items-center gap-2 mb-4">
+                                <div className="flex flex-col gap-0.5">
+                                  <div className="h-0.5 w-4 bg-black dark:bg-white"></div>
+                                  <div className="h-0.5 w-4 bg-black dark:bg-white"></div>
+                                  <div className="h-0.5 w-4 bg-black dark:bg-white"></div>
+                                </div>
+                                <div>
+                                  <h3 className="font-bold text-sm uppercase tracking-wider" style={{ fontFamily: 'var(--font-adi)' }}>Training Zones</h3>
+                                  <p className="text-xs text-black/60 dark:text-white/60 mt-0.5" style={{ fontFamily: 'var(--font-adi)' }}>Threshold: {result.thresholdPace}</p>
+                                </div>
+                              </div>
+                              <div className="space-y-2 border-t border-black/10 dark:border-white/10 pt-4">
+                                {[
+                                  { label: 'Zone 1', subtitle: 'Easy/Recovery', value: result.zone1 },
+                                  { label: 'Zone 2', subtitle: 'Aerobic Endurance', value: result.zone2 },
+                                  { label: 'Zone 3', subtitle: 'Tempo', value: result.zone3 },
+                                  { label: 'Zone 4', subtitle: 'Threshold', value: result.zone4 },
+                                  { label: 'Zone 5', subtitle: 'VO2 Max', value: result.zone5 },
+                                ].map((zone, idx) => (
+                                  <div key={idx} className="flex items-center justify-between py-2 border-b border-black/5 dark:border-white/5 last:border-0">
+                                    <div>
+                                      <p className="text-xs font-semibold uppercase tracking-wider" style={{ fontFamily: 'var(--font-adi)' }}>{zone.label}</p>
+                                      <p className="text-xs text-black/50 dark:text-white/50" style={{ fontFamily: 'var(--font-adi)' }}>{zone.subtitle}</p>
+                                    </div>
+                                    <p className="font-mono text-sm font-bold" style={{ fontFamily: 'var(--font-adi)' }}>{zone.value}</p>
+                                  </div>
+                                ))}
+                              </div>
                     </div>
                   );
                 }
                 
-                // Handle error state
-                if (toolPart.state === 'error') {
+                        // Race Time Predictions
+                        if (toolPart.toolName === 'predictRaceTime') {
+                          const result = toolPart.output as {
+                            baseRace: string;
+                            predictions: {
+                              '5K': string;
+                              '10K': string;
+                              'Half Marathon': string;
+                              'Marathon': string;
+                            };
+                          };
                   return (
-                    <div key={`${message.id}-${i}`} className="text-red-500 bg-red-50 dark:bg-red-900/20 p-2 rounded">
-                      Error: {toolPart.errorText}
+                            <div key={`${message.id}-${i}`} className="bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 p-6 rounded-lg my-2">
+                              <div className="flex items-center gap-2 mb-4">
+                                <div className="flex flex-col gap-0.5">
+                                  <div className="h-0.5 w-4 bg-black dark:bg-white"></div>
+                                  <div className="h-0.5 w-4 bg-black dark:bg-white"></div>
+                                  <div className="h-0.5 w-4 bg-black dark:bg-white"></div>
+                                </div>
+                                <div>
+                                  <h3 className="font-bold text-sm uppercase tracking-wider" style={{ fontFamily: 'var(--font-adi)' }}>Race Predictions</h3>
+                                  <p className="text-xs text-black/60 dark:text-white/60 mt-0.5" style={{ fontFamily: 'var(--font-adi)' }}>Based on: {result.baseRace}</p>
+                                </div>
+                              </div>
+                              <div className="grid grid-cols-2 gap-3 border-t border-black/10 dark:border-white/10 pt-4">
+                                {Object.entries(result.predictions).map(([race, time]) => (
+                                  <div key={race} className="text-center py-3 border border-black/10 dark:border-white/10 rounded">
+                                    <p className="text-xs uppercase tracking-wider text-black/60 dark:text-white/60 mb-1" style={{ fontFamily: 'var(--font-adi)' }}>{race}</p>
+                                    <p className="text-xl font-bold font-mono" style={{ fontFamily: 'var(--font-adi)' }}>{time}</p>
+                                  </div>
+                                ))}
+                      </div>
                     </div>
                   );
                 }
                 
-                return null;
-              }
+                        // Fallback
+                return (
+                          <div key={`${message.id}-${i}`} className="bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 p-4 rounded-lg">
+                            <pre className="text-xs font-mono overflow-x-auto">
+                              {JSON.stringify(toolPart.output, null, 2)}
+                  </pre>
+                          </div>
+                        );
+                      }
+                      
+                      // Loading state
+                      if (toolPart.state === 'call') {
+                        return (
+                          <div key={`${message.id}-${i}`} className="text-black/40 dark:text-white/40 italic text-sm">
+                            Calculating...
+                          </div>
+                        );
+                      }
+                      
+                      // Error state
+                      if (toolPart.state === 'error') {
+                        return (
+                          <div key={`${message.id}-${i}`} className="bg-black/5 dark:bg-white/5 border border-black/20 dark:border-white/20 p-3 rounded text-sm">
+                            Error: {toolPart.errorText}
+                          </div>
+                        );
+                      }
+                      
+                      return null;
+                    }
               
               default:
                 return null;
             }
           })}
+              </div>
         </div>
       ))}
+        </div>
+      </main>
 
+      {/* Input Area */}
+      <footer className="fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-black/95 backdrop-blur-sm border-t border-black/10 dark:border-white/10">
+        <div className="flex justify-center px-6 py-4">
       <form
         onSubmit={e => {
           e.preventDefault();
+              if (input.trim()) {
           sendMessage({ text: input });
           setInput('');
+              }
         }}
+            className="flex items-center gap-3 w-full max-w-2xl"
       >
+            <div className="flex-1 relative">
         <input
-          className="fixed dark:bg-zinc-900 bottom-0 w-full max-w-md p-2 mb-8 border border-zinc-300 dark:border-zinc-800 rounded shadow-xl"
+                className="w-full bg-black/5 dark:bg-white/5 border border-black/20 dark:border-white/20 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-black dark:focus:border-white transition-colors"
           value={input}
-          placeholder="Ask about running pace, zones, or race predictions..."
+                placeholder="Ask about pace, zones, or predictions..."
           onChange={e => setInput(e.currentTarget.value)}
         />
+            </div>
+            <button
+              type="submit"
+              className="bg-black text-white dark:bg-white dark:text-black px-6 py-3 rounded-lg font-semibold text-sm uppercase tracking-wider hover:opacity-80 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{ fontFamily: 'var(--font-adi)' }}
+              disabled={!input.trim()}
+            >
+              Send
+            </button>
       </form>
+        </div>
+      </footer>
     </div>
   );
 }
