@@ -12,6 +12,7 @@ export function MarkdownText({ text }: MarkdownTextProps) {
   const elements: React.ReactNode[] = [];
   let currentList: string[] = [];
   let inList = false;
+  let lastWasBreak = false;
 
   const flushList = () => {
     if (currentList.length > 0) {
@@ -88,6 +89,7 @@ export function MarkdownText({ text }: MarkdownTextProps) {
     // Handle headers
     if (trimmed.startsWith('## ')) {
       flushList();
+      lastWasBreak = false;
       elements.push(
         <h3 key={`h3-${lineIndex}`} className="text-lg font-bold mt-6 mb-3 uppercase tracking-wider" style={{ fontFamily: 'var(--font-adi)' }}>
           {trimmed.substring(3)}
@@ -98,6 +100,7 @@ export function MarkdownText({ text }: MarkdownTextProps) {
     
     if (trimmed.startsWith('### ')) {
       flushList();
+      lastWasBreak = false;
       elements.push(
         <h4 key={`h4-${lineIndex}`} className="text-base font-bold mt-4 mb-2 uppercase tracking-wider" style={{ fontFamily: 'var(--font-adi)' }}>
           {trimmed.substring(4)}
@@ -130,6 +133,7 @@ export function MarkdownText({ text }: MarkdownTextProps) {
     // Handle horizontal rules
     if (trimmed === '---' || trimmed === '***') {
       flushList();
+      lastWasBreak = false;
       elements.push(
         <hr key={`hr-${lineIndex}`} className="my-4 border-black/10 dark:border-white/10" />
       );
@@ -139,6 +143,7 @@ export function MarkdownText({ text }: MarkdownTextProps) {
     // Regular paragraph
     if (trimmed) {
       flushList();
+      lastWasBreak = false;
       // Check if line contains a colon and might be a definition list item
       if (trimmed.includes(':') && trimmed.length < 100) {
         const [term, ...defParts] = trimmed.split(':');
@@ -159,8 +164,10 @@ export function MarkdownText({ text }: MarkdownTextProps) {
     } else {
       // Empty line - flush list and add spacing
       flushList();
-      if (elements.length > 0 && elements[elements.length - 1]?.type !== 'br') {
+      // Add spacing for empty lines (avoid consecutive breaks)
+      if (!lastWasBreak) {
         elements.push(<br key={`br-${lineIndex}`} />);
+        lastWasBreak = true;
       }
     }
   });

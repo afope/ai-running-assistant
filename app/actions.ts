@@ -1,19 +1,26 @@
 import { zodSchema } from 'ai';
 import { z } from 'zod';
 
+// Define parameter schemas separately to avoid circular type references
+const calculatePaceParams = z.object({
+  distance: z.number().describe('Distance in kilometers'),
+  hours: z.number().optional().default(0),
+  minutes: z.number(),
+  seconds: z.number().optional().default(0),
+});
+
+const suggestTrainingZonesParams = z.object({
+  thresholdPace: z
+    .string()
+    .describe('Threshold pace in min:sec per km format (e.g., "4:30")'),
+});
+
 export const runningTools = {
     calculatePace: {
       description: 'Calculate running pace for a given distance and time',
-      parameters: zodSchema(
-        z.object({
-          distance: z.number().describe('Distance in kilometers'),
-          hours: z.number().optional().default(0),
-          minutes: z.number(),
-          seconds: z.number().optional().default(0),
-        }),
-      ),
+      parameters: zodSchema(calculatePaceParams),
       execute: async ({ distance, hours = 0, minutes, seconds = 0 }: z.infer<
-        typeof runningTools.calculatePace.parameters
+        typeof calculatePaceParams
       >) => {
         const totalMinutes = hours * 60 + minutes + seconds / 60;
         const pacePerKm = totalMinutes / distance;
@@ -30,15 +37,9 @@ export const runningTools = {
     
     suggestTrainingZones: {
       description: 'Calculate heart rate or pace training zones based on threshold values',
-      parameters: zodSchema(
-        z.object({
-          thresholdPace: z
-            .string()
-            .describe('Threshold pace in min:sec per km format (e.g., "4:30")'),
-        }),
-      ),
+      parameters: zodSchema(suggestTrainingZonesParams),
       execute: async ({ thresholdPace }: z.infer<
-        typeof runningTools.suggestTrainingZones.parameters
+        typeof suggestTrainingZonesParams
       >) => {
         // Parse threshold pace (format: "4:30")
         const [minutes, seconds] = thresholdPace.split(':').map(Number);
