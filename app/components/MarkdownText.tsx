@@ -45,13 +45,18 @@ export function MarkdownText({ text }: MarkdownTextProps) {
   };
 
   const formatInlineMarkdown = (line: string): React.ReactNode => {
+    if (!line) return null;
+    
     const parts: React.ReactNode[] = [];
     let currentIndex = 0;
     
-    // Match bold text **text** or *text*
-    const boldRegex = /\*\*([^*]+)\*\*/g;
+    // Match bold text **text** - improved regex to handle multiple bold sections
+    const boldRegex = /\*\*([^*]+?)\*\*/g;
     const matches: Array<{ start: number; end: number; text: string }> = [];
     let match;
+    
+    // Reset regex lastIndex to avoid issues with global regex
+    boldRegex.lastIndex = 0;
     
     while ((match = boldRegex.exec(line)) !== null) {
       matches.push({
@@ -68,7 +73,10 @@ export function MarkdownText({ text }: MarkdownTextProps) {
     matches.forEach((m, idx) => {
       // Add text before match
       if (m.start > currentIndex) {
-        parts.push(<span key={`text-${idx}`}>{line.substring(currentIndex, m.start)}</span>);
+        const beforeText = line.substring(currentIndex, m.start);
+        if (beforeText) {
+          parts.push(<span key={`text-${idx}`}>{beforeText}</span>);
+        }
       }
       // Add bold text
       parts.push(<strong key={`bold-${idx}`} className="font-bold">{m.text}</strong>);
@@ -77,7 +85,10 @@ export function MarkdownText({ text }: MarkdownTextProps) {
     
     // Add remaining text
     if (currentIndex < line.length) {
-      parts.push(<span key="text-end">{line.substring(currentIndex)}</span>);
+      const remainingText = line.substring(currentIndex);
+      if (remainingText) {
+        parts.push(<span key="text-end">{remainingText}</span>);
+      }
     }
     
     return <>{parts}</>;
@@ -92,7 +103,7 @@ export function MarkdownText({ text }: MarkdownTextProps) {
       lastWasBreak = false;
       elements.push(
         <h3 key={`h3-${lineIndex}`} className="text-lg font-bold mt-6 mb-3 uppercase tracking-wider" style={{ fontFamily: 'var(--font-adi)' }}>
-          {trimmed.substring(3)}
+          {formatInlineMarkdown(trimmed.substring(3))}
         </h3>
       );
       return;
@@ -103,7 +114,7 @@ export function MarkdownText({ text }: MarkdownTextProps) {
       lastWasBreak = false;
       elements.push(
         <h4 key={`h4-${lineIndex}`} className="text-base font-bold mt-4 mb-2 uppercase tracking-wider" style={{ fontFamily: 'var(--font-adi)' }}>
-          {trimmed.substring(4)}
+          {formatInlineMarkdown(trimmed.substring(4))}
         </h4>
       );
       return;
