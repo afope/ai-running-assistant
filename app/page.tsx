@@ -43,9 +43,67 @@ export default function Chat() {
               </div>
             </div>
             <h2 className="text-4xl font-bold mb-4 tracking-tight" style={{ fontFamily: 'var(--font-adi)' }}>ready to have the best <span className="line-through">fun</span> run of your life?</h2>
-            <p className="text-black/60 dark:text-white/60 text-lg mb-8 max-w-md mx-auto">
-              ask me about pace calculations, training zones, or race predictions.
+            <p className="text-black/60 dark:text-white/60 text-base mb-8 max-w-md mx-auto" style={{ fontFamily: 'var(--font-adi)' }}>
+              built to make you faster, better, stronger
             </p>
+            
+            <div className="max-w-2xl mx-auto grid grid-cols-2 gap-3 mt-12">
+              <button
+                onClick={() => {
+                  setInput("i want to run my first marathon in 6 months");
+                  setTimeout(() => {
+                    sendMessage({ text: "i want to run my first marathon in 6 months" });
+                    setInput('');
+                  }, 100);
+                }}
+                className="text-left px-6 py-4 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 rounded-lg border border-black/10 dark:border-white/10 transition-colors text-base"
+                style={{ fontFamily: 'var(--font-adi)' }}
+              >
+                i want to run my first marathon in 6 months
+              </button>
+              
+              <button
+                onClick={() => {
+                  setInput("how do i get faster at 5k?");
+                  setTimeout(() => {
+                    sendMessage({ text: "how do i get faster at 5k?" });
+                    setInput('');
+                  }, 100);
+                }}
+                className="text-left px-6 py-4 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 rounded-lg border border-black/10 dark:border-white/10 transition-colors text-base"
+                style={{ fontFamily: 'var(--font-adi)' }}
+              >
+                how do i get faster at 5k?
+              </button>
+              
+              <button
+                onClick={() => {
+                  setInput("i keep getting shin splints, what should i do?");
+                  setTimeout(() => {
+                    sendMessage({ text: "i keep getting shin splints, what should i do?" });
+                    setInput('');
+                  }, 100);
+                }}
+                className="text-left px-6 py-4 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 rounded-lg border border-black/10 dark:border-white/10 transition-colors text-base"
+                style={{ fontFamily: 'var(--font-adi)' }}
+              >
+                i keep getting shin splints, what should i do?
+              </button>
+              
+              <button
+                onClick={() => {
+                  setInput("what's a good beginner running plan?");
+                  setTimeout(() => {
+                    sendMessage({ text: "what's a good beginner running plan?" });
+                    setInput('');
+                  }, 100);
+                }}
+                className="text-left px-6 py-4 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 rounded-lg border border-black/10 dark:border-white/10 transition-colors text-base"
+                style={{ fontFamily: 'var(--font-adi)' }}
+              >
+                what&apos;s a good beginner running plan?
+              </button>
+            </div>
           </div>
         )}
 
