@@ -23,16 +23,16 @@ export function MarkdownText({ text }: MarkdownTextProps) {
             const subBulletMatch = item.match(/^(.+?):\s*\* (.+)$/);
             if (subBulletMatch) {
               return (
-                <li key={idx} className="text-sm">
+                <li key={idx} className="text-base">
                   <span className="font-semibold">{formatInlineMarkdown(subBulletMatch[1])}:</span>
                   <ul className="list-disc list-inside ml-4 mt-1 space-y-1">
-                    <li className="text-sm text-black/70 dark:text-white/70">{formatInlineMarkdown(subBulletMatch[2])}</li>
+                    <li className="text-base text-black/70 dark:text-white/70">{formatInlineMarkdown(subBulletMatch[2])}</li>
                   </ul>
                 </li>
               );
             }
             return (
-              <li key={idx} className="text-sm leading-relaxed">
+              <li key={idx} className="text-base leading-relaxed">
                 {formatInlineMarkdown(item)}
               </li>
             );
@@ -79,7 +79,7 @@ export function MarkdownText({ text }: MarkdownTextProps) {
         }
       }
       // Add bold text
-      parts.push(<strong key={`bold-${idx}`} className="font-bold">{m.text}</strong>);
+      parts.push(<strong key={`bold-${idx}`} className="font-medium" style={{ fontWeight: 500 }}>{m.text}</strong>);
       currentIndex = m.end;
     });
     
@@ -167,7 +167,7 @@ export function MarkdownText({ text }: MarkdownTextProps) {
         );
       } else {
         elements.push(
-          <p key={`p-${lineIndex}`} className="mb-3 leading-relaxed text-sm">
+          <p key={`p-${lineIndex}`} className="mb-3 leading-relaxed text-base">
             {formatInlineMarkdown(trimmed)}
           </p>
         );

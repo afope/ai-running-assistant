@@ -105,11 +105,11 @@ export default function Chat() {
                                 <div className="grid grid-cols-2 gap-4 border-t border-black/10 dark:border-white/10 pt-3">
                                   <div>
                                     <p className="text-xs uppercase tracking-wider text-black/60 dark:text-white/60 mb-1" style={{ fontFamily: 'var(--font-adi)' }}>Time</p>
-                                    <p className="text-lg font-semibold" style={{ fontFamily: 'var(--font-adi)' }}>{result.totalTime}</p>
+                                    <p className="text-lg" style={{ fontFamily: 'var(--font-adi)' }}>{result.totalTime}</p>
                                   </div>
                                   <div>
                                     <p className="text-xs uppercase tracking-wider text-black/60 dark:text-white/60 mb-1" style={{ fontFamily: 'var(--font-adi)' }}>Distance</p>
-                                    <p className="text-lg font-semibold" style={{ fontFamily: 'var(--font-adi)' }}>{result.distance} km</p>
+                                    <p className="text-lg" style={{ fontFamily: 'var(--font-adi)' }}>{result.distance} km</p>
                                   </div>
                                 </div>
                               </div>
@@ -253,16 +253,16 @@ export default function Chat() {
       >
             <div className="flex-1 relative">
         <input
-                className="w-full bg-black/5 dark:bg-white/5 border border-black/20 dark:border-white/20 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-black dark:focus:border-white transition-colors"
+                className="w-full bg-black/5 dark:bg-white/5 border border-black/20 dark:border-white/20 rounded-lg px-4 py-3 text-base focus:outline-none focus:border-black dark:focus:border-white transition-colors"
           value={input}
-                placeholder="Ask about pace, zones, or predictions..."
+                placeholder="ask about pace, zones, or predictions"
           onChange={e => setInput(e.currentTarget.value)}
         />
             </div>
             <button
               type="submit"
-              className="bg-black text-white dark:bg-white dark:text-black px-6 py-3 rounded-lg font-semibold text-sm uppercase tracking-wider hover:opacity-80 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{ fontFamily: 'var(--font-adi)' }}
+              className="bg-black text-white dark:bg-white dark:text-black px-6 py-3 rounded-lg font-medium text-base uppercase tracking-wider hover:opacity-80 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{ fontWeight: 500, fontFamily: 'var(--font-adi)' }}
               disabled={!input.trim()}
             >
               Send
