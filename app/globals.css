@@ -75,3 +75,13 @@ label, a {
 .adi-stripes-vertical::after {
   right: 0;
 }
+
+/* Blink animation for loading stripes */
+@keyframes blink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}

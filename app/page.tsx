@@ -8,6 +8,10 @@ export default function Chat() {
   const [input, setInput] = useState('');
   const { messages, sendMessage } = useChat();
   
+  // Check if waiting for response (last message is from user)
+  const lastMessage = messages[messages.length - 1];
+  const isLoading = lastMessage?.role === 'user';
+  
   return (
     <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white">
       {/* Header */}
@@ -57,12 +61,41 @@ export default function Chat() {
               case 'text':
                       if (message.role === 'user') {
                         return (
-                          <div 
-                            key={`${message.id}-${i}`} 
-                            className="inline-block px-4 py-3 rounded-lg bg-black text-white dark:bg-white dark:text-black"
-                          >
-                            {part.text}
-                          </div>
+                          <>
+                            <div 
+                              key={`${message.id}-${i}`} 
+                              className="inline-block px-4 py-3 rounded-lg bg-black text-white dark:bg-white dark:text-black"
+                            >
+                              {part.text}
+                            </div>
+                            {isLoading && message.id === lastMessage?.id && (
+                              <div className="flex justify-start mt-4">
+                                <div className="flex items-center gap-0.5">
+                                  <div 
+                                    className="w-0.5 h-4 bg-black dark:bg-white transform -skew-x-12"
+                                    style={{
+                                      animation: 'blink 1s ease-in-out infinite',
+                                      animationDelay: '0ms'
+                                    }}
+                                  ></div>
+                                  <div 
+                                    className="w-0.5 h-4 bg-black dark:bg-white transform -skew-x-12"
+                                    style={{
+                                      animation: 'blink 1s ease-in-out infinite',
+                                      animationDelay: '200ms'
+                                    }}
+                                  ></div>
+                                  <div 
+                                    className="w-0.5 h-4 bg-black dark:bg-white transform -skew-x-12"
+                                    style={{
+                                      animation: 'blink 1s ease-in-out infinite',
+                                      animationDelay: '400ms'
+                                    }}
+                                  ></div>
+                                </div>
+                              </div>
+                            )}
+                          </>
                         );
                       } else {
                         return (

@@ -48,44 +48,52 @@ export function MarkdownText({ text }: MarkdownTextProps) {
     if (!line) return null;
     
     const parts: React.ReactNode[] = [];
-    let currentIndex = 0;
+    let lastIndex = 0;
     
-    // Match bold text **text** - improved regex to handle multiple bold sections
-    const boldRegex = /\*\*([^*]+?)\*\*/g;
+    // Match bold text **text** - more robust regex
+    // This matches ** followed by one or more non-asterisk characters, followed by **
+    const boldRegex = /\*\*([^*]+)\*\*/g;
     const matches: Array<{ start: number; end: number; text: string }> = [];
     let match;
     
-    // Reset regex lastIndex to avoid issues with global regex
+    // Reset regex lastIndex to start from beginning
     boldRegex.lastIndex = 0;
     
+    // Find all matches
     while ((match = boldRegex.exec(line)) !== null) {
       matches.push({
         start: match.index,
         end: match.index + match[0].length,
-        text: match[1],
+        text: match[1].trim(), // Trim whitespace from matched text
       });
     }
     
+    // If no matches, return plain text
     if (matches.length === 0) {
       return <span>{line}</span>;
     }
     
+    // Build parts array with text and bold sections
     matches.forEach((m, idx) => {
-      // Add text before match
-      if (m.start > currentIndex) {
-        const beforeText = line.substring(currentIndex, m.start);
+      // Add text before this match
+      if (m.start > lastIndex) {
+        const beforeText = line.substring(lastIndex, m.start);
         if (beforeText) {
-          parts.push(<span key={`text-${idx}`}>{beforeText}</span>);
+          parts.push(<span key={`text-before-${idx}`}>{beforeText}</span>);
         }
       }
       // Add bold text
-      parts.push(<strong key={`bold-${idx}`} className="font-medium" style={{ fontWeight: 500 }}>{m.text}</strong>);
-      currentIndex = m.end;
+      parts.push(
+        <strong key={`bold-${idx}`} className="font-medium" style={{ fontWeight: 500 }}>
+          {m.text}
+        </strong>
+      );
+      lastIndex = m.end;
     });
     
-    // Add remaining text
-    if (currentIndex < line.length) {
-      const remainingText = line.substring(currentIndex);
+    // Add any remaining text after the last match
+    if (lastIndex < line.length) {
+      const remainingText = line.substring(lastIndex);
       if (remainingText) {
         parts.push(<span key="text-end">{remainingText}</span>);
       }
